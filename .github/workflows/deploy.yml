@@ -46,9 +46,9 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker load < s3-app.tar
-            docker stop s3-app || true
-            docker rm s3-app || true
-            docker run -d -p 3000:3000 \
+            sudo docker load < s3-app.tar
+            sudo docker stop s3-app || true
+            sudo docker rm s3-app || true
+            sudo docker run -d -p 3000:3000 \
               --env-file .env \
               --name s3-app s3-app
