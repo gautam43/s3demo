@@ -5,11 +5,15 @@ const multer = require('multer');
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// AWS config
+// AWS config  // For local use this 
+// AWS.config.update({
+//   accessKeyId: process.env.AWS_ACCESS_KEY,
+//   secretAccessKey: process.env.AWS_SECRET_KEY,
+//   region: process.env.AWS_REGION,
+// });
+
 AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_KEY,
-  region: process.env.AWS_REGION,
+  region: process.env.AWS_REGION,                                      // For production use this 
 });
 
 const s3 = new AWS.S3();
