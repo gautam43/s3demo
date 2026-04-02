@@ -47,8 +47,11 @@ jobs:
         aws ssm send-command \
           --instance-ids i-0d9025ce1fd15c3c1 \
           --document-name "AWS-RunShellScript" \
-          --parameters commands="\
-            sudo docker pull 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest && \
-            sudo docker stop app || true && \
-            sudo docker rm app || true && \
-            sudo docker run -d --name app -p 3000:3000 -p 80:80 --env-file .env 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest"
+          --parameters 'commands=[
+            "set -euo pipefail",
+            "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 551828037252.dkr.ecr.ap-south-1.amazonaws.com",
+            "sudo docker pull 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest",
+            "sudo docker stop app || true",
+            "sudo docker rm app || true",
+            "sudo docker run -d --name app -p 3000:3000 -p 80:80 --env-file /home/ubuntu/.env 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest"
+          ]'
