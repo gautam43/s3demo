@@ -1,0 +1,55 @@
+name: Build and Push to ECR
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:   # 👈 This enables manual run
+
+permissions:
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # 1️⃣ Configure AWS credentials
+    - name: Configure AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::551828037252:role/Github-oidc-role-ecr-ssm
+        aws-region: ap-south-1
+
+    # 2️⃣ Login to ECR
+    - name: Login to ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    # 3️⃣ Setup Docker Buildx
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    # 4️⃣ Build and Push
+    - name: Build and Push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true   # 👈 IMPORTANT (changed from false)
+        tags: ${{ steps.login-ecr.outputs.registry }}/test-s3:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+
+    - name: Deploy via SSM
+      run: |
+        aws ssm send-command \
+          --instance-ids i-0d9025ce1fd15c3c1 \
+          --document-name "AWS-RunShellScript" \
+          --parameters commands="\
+            docker pull 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest && \
+            docker stop app || true && \
+            docker rm app || true && \
+            docker run -d --name app -p 3000:3000 -p 80:80 --env-file .env 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest"
