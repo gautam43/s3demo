@@ -48,7 +48,7 @@ jobs:
           --instance-ids i-0d9025ce1fd15c3c1 \
           --document-name "AWS-RunShellScript" \
           --parameters commands="\
-            docker pull 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest && \
-            docker stop app || true && \
-            docker rm app || true && \
-            docker run -d --name app -p 3000:3000 -p 80:80 --env-file .env 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest"
+            sudo docker pull 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest && \
+            sudo docker stop app || true && \
+            sudo docker rm app || true && \
+            sudo docker run -d --name app -p 3000:3000 -p 80:80 --env-file .env 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest"
