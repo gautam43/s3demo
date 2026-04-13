@@ -73,7 +73,7 @@ jobs:
           --instance-ids "$INSTANCE_ID" \
           --document-name "AWS-RunShellScript" \
           --parameters 'commands=[
-            "set -euo pipefail",
+            "set -e",
 
             "LOGIN_PASSWORD=$(aws ecr get-login-password --region ap-south-1)",
             "echo \"$LOGIN_PASSWORD\" | sudo docker login --username AWS --password-stdin 551828037252.dkr.ecr.ap-south-1.amazonaws.com",
