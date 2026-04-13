@@ -63,6 +63,7 @@ jobs:
     #       ]'
 
     - name: Run SSM Command and wait for result
+      shell: bash
       run: |
         set -euo pipefail
 
