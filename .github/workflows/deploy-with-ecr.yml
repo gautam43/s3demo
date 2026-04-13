@@ -65,7 +65,7 @@ jobs:
     - name: Run SSM Command and wait for result
       shell: bash
       run: |
-        set -euo pipefail
+        set -e
 
         INSTANCE_ID="i-0d9025ce1fd15c3c1"
 
