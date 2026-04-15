@@ -1,6 +1,7 @@
 # 🔐 Environment variables (VERY IMPORTANT)
 .env
 .env.*
+*.drawio
 
 # 🧱 Node modules
 node_modules/
