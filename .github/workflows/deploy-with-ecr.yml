@@ -16,23 +16,23 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # 1️⃣ Configure AWS credentials
+    # Configure AWS credentials
     - name: Configure AWS
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: arn:aws:iam::551828037252:role/Github-oidc-role-ecr-ssm
         aws-region: ap-south-1
 
-    # 2️⃣ Login to ECR
+    # Login to ECR
     - name: Login to ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
-    # 3️⃣ Setup Docker Buildx
+    # Setup Docker Buildx
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    # 4️⃣ Build and Push
+    # Build and Push
     - name: Build and Push Docker image
       uses: docker/build-push-action@v5
       with:
@@ -74,6 +74,7 @@ jobs:
           --document-name "AWS-RunShellScript" \
           --parameters 'commands=[
             "set -e",
+            "sudo systemctl start docker",
 
             "LOGIN_PASSWORD=$(aws ecr get-login-password --region ap-south-1)",
             "echo \"$LOGIN_PASSWORD\" | sudo docker login --username AWS --password-stdin 551828037252.dkr.ecr.ap-south-1.amazonaws.com",
