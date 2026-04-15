@@ -8,9 +8,9 @@ on:
 permissions:
   id-token: write
 
-env:
-  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
-  INSTANCE_ID: ${{ vars.INSTANCE_ID }}
+# env:
+#   AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+#   INSTANCE_ID: ${{ vars.INSTANCE_ID }}
 
 jobs:
   build:
@@ -24,7 +24,7 @@ jobs:
     - name: Configure AWS
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/Github-oidc-role-ecr-ssm
+        role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/Github-oidc-role-ecr-ssm
         aws-region: ap-south-1
 
     - name: debug
@@ -57,7 +57,7 @@ jobs:
       run: |
         set -e
 
-        INSTANCE_ID=$INSTANCE_ID
+        #INSTANCE_ID=$INSTANCE_ID
         #AWS_ACCOUNT_ID=${{ env.AWS_ACCOUNT_ID }}
         # Set this to your EC2 instance ID
 
