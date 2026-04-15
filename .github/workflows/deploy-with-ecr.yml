@@ -8,6 +8,9 @@ on:
 permissions:
   id-token: write
 
+env:
+  AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,7 +23,7 @@ jobs:
     - name: Configure AWS
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::551828037252:role/Github-oidc-role-ecr-ssm
+        role-to-assume: arn:aws:iam::$AWS_ACCOUNT_ID:role/Github-oidc-role-ecr-ssm
         aws-region: ap-south-1
 
     # Login to ECR
@@ -42,32 +45,12 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-    # - name: Deploy via SSM
-    #   run: |
-    #     aws ssm send-command \
-    #       --instance-ids i-0d9025ce1fd15c3c1 \
-    #       --document-name "AWS-RunShellScript" \
-    #       --region ap-south-1 \
-    #       --parameters 'commands=[
-    #         "set -euo pipefail",
-
-    #         "LOGIN_PASSWORD=$(aws ecr get-login-password --region ap-south-1)",
-    #         "echo \"$LOGIN_PASSWORD\" | sudo docker login --username AWS --password-stdin 551828037252.dkr.ecr.ap-south-1.amazonaws.com",
-
-    #         "sudo docker pull 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest",
-
-    #         "sudo docker stop app || true",
-    #         "sudo docker rm app || true",
-
-    #         "sudo docker run -d --name app -p 3000:3000 -p 80:80 --env-file /home/ubuntu/.env 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest"
-    #       ]'
-
     - name: Run SSM Command and wait for result
       shell: bash
       run: |
         set -e
 
-        INSTANCE_ID="i-0d9025ce1fd15c3c1"
+        INSTANCE_ID=$INSTANCE_ID  # Set this to your EC2 instance ID
 
         COMMAND_ID=$(aws ssm send-command \
           --instance-ids "$INSTANCE_ID" \
@@ -75,16 +58,18 @@ jobs:
           --parameters 'commands=[
             "set -e",
             "sudo systemctl start docker",
+            "export AWS_REGION=${{ secrets.AWS_REGION }}",
+            "export AWS_REGION=${{ secrets.S3_BUCKET }}",
 
             "LOGIN_PASSWORD=$(aws ecr get-login-password --region ap-south-1)",
-            "echo \"$LOGIN_PASSWORD\" | sudo docker login --username AWS --password-stdin 551828037252.dkr.ecr.ap-south-1.amazonaws.com",
+            "echo \"$LOGIN_PASSWORD\" | sudo docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com",
 
-            "sudo docker pull 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest",
+            "sudo docker pull $AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest",
 
             "sudo docker stop app || true",
             "sudo docker rm app || true",
 
-            "sudo docker run -d --name app -p 3000:3000 -p 80:80 --env-file /home/ubuntu/.env 551828037252.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest"
+            "sudo docker run -d --name app -p 3000:3000 -p 80:80 $AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest"
           ]' \
           --query "Command.CommandId" \
           --output text)
