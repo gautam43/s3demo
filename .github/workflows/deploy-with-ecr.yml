@@ -58,6 +58,8 @@ jobs:
           [
             "set -e",
             "sudo systemctl start docker",
+            "export AWS_REGION=${{ secrets.AWS_REGION }}",
+            "export S3_BUCKET=${{ secrets.S3_BUCKET }}",
             "LOGIN_PASSWORD=\$(aws ecr get-login-password --region ap-south-1)",
             "echo \"\$LOGIN_PASSWORD\" | sudo docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.ap-south-1.amazonaws.com",
             "sudo docker pull ${{ needs.build.outputs.image }}",
