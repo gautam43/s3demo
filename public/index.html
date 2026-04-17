@@ -1,17 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>S3 Upload</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #333;
+    }
+
+    .card {
+      background: #fff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      text-align: center;
+      width: 320px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #444;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .upload-label {
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: 8px;
+      background: #f1f1f1;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: 0.3s;
+    }
+
+    .upload-label:hover {
+      background: #e2e2e2;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #667eea;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #5a67d8;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-size: 14px;
+      word-break: break-all;
+      color: #555;
+    }
+  </style>
 </head>
+
 <body>
-  <h2>Upload File to S3</h2>
 
-  <form id="uploadForm">
-    <input type="file" name="file" required />
-    <button type="submit">Upload</button>
-  </form>
+  <div class="card">
+    <h2>Upload to S3</h2>
 
-  <p id="status"></p>
+    <form id="uploadForm">
+      <label class="upload-label">
+        Choose File
+        <input type="file" name="file" required />
+      </label>
+
+      <button type="submit">Upload</button>
+    </form>
+
+    <p id="status"></p>
+  </div>
 
   <script>
     const form = document.getElementById('uploadForm');
@@ -21,14 +99,21 @@
 
       const formData = new FormData(form);
 
-      const res = await fetch('/upload', {
-        method: 'POST',
-        body: formData
-      });
+      document.getElementById('status').innerText = "Uploading...";
 
-      const data = await res.json();
-      document.getElementById('status').innerText = data.url || data.error;
+      try {
+        const res = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+        document.getElementById('status').innerText = data.url || data.error;
+      } catch (err) {
+        document.getElementById('status').innerText = "Upload failed";
+      }
     });
   </script>
+
 </body>
 </html>
