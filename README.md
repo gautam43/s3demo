@@ -48,19 +48,19 @@ sudo systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service
 
 Attach an IAM role with:
 
-ECR read access
-SSM permissions
-S3 access
-2. GitHub OIDC Role
+ECR read access  
+SSM permissions  
+S3 access  
+2. GitHub OIDC Role  
 
-Create an IAM role:
+Create an IAM role:  
 
-Github-oidc-role-ecr-ssm
+Github-oidc-role-ecr-ssm  
 
-Permissions:
+Permissions:  
 
-*ECR (push/pull)
-*SSM (send-command)
+ECR (push/pull)    
+SSM (send-command)  
 
 Trust relationship:
 
@@ -143,11 +143,11 @@ docker run -d \
 
 These are injected into the container:
 
-Variable	Description
-AWS_REGION	
-*AWS region for SDK
-S3_BUCKET	
-*S3 bucket for file uploads
+#### Variable	Description
+AWS_REGION  	
+AWS region for SDK  
+S3_BUCKET  	
+S3 bucket for file uploads  
 ### 📦 Application
 Simple UI for uploading files
 Files are stored in S3
