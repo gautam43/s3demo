@@ -11,19 +11,7 @@ The pipeline:
 ---
 
 # 🧠 Architecture Flow
-GitHub Push
-↓
-GitHub Actions (OIDC Auth)
-↓
-Build Docker Image
-↓
-Push to ECR
-↓
-SSM → EC2 → Run Container
-↓
-App → Upload File → S3
-
-
+![FLow Diagram](architectureDiagram.drawio.png)
 ---
 
 # ⚙️ Prerequisites
@@ -55,7 +43,7 @@ sudo snap install amazon-ssm-agent --classic
 sudo systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service
 ```
 
-🔐## IAM Requirements
+## 🔐 IAM Requirements
 1. EC2 Instance Role
 
 Attach an IAM role with:
@@ -78,7 +66,7 @@ Trust relationship:
 
 *GitHub OIDC provider
 
-⚙️ GitHub Repository Setup
+## ⚙️ GitHub Repository Setup
 Variables (Settings → Variables)
 AWS_ACCOUNT_ID
 INSTANCE_ID
@@ -89,7 +77,7 @@ S3_BUCKET
 These will be passed to the container as environment variables.
 
 ## GitHub Actions Workflow
-### Build Job
+### 🏗️ Build Job
 Checkout Code
 ```
 - name: Checkout code
@@ -115,7 +103,7 @@ IMAGE_URI=<ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/test-s3:latest
 docker build -t $IMAGE_URI .
 docker push $IMAGE_URI
 ```
-🚀 Deploy Job (via SSM)
+### 🚀 Deploy Job (via SSM)
 Send Command to EC2
 ```
 aws ssm send-command
@@ -123,7 +111,7 @@ aws ssm send-command
 
 This runs commands remotely on the EC2 instance.
 
-🧾 Deployment Commands Explained
+### 🧾 Deployment Commands Explained
 Start Docker
 ```
 sudo systemctl start docker
@@ -151,7 +139,7 @@ docker run -d \
   -p 3000:3000 \
   <IMAGE_URI>
 ```
-🌍 Environment Variables
+## 🌍 Environment Variables
 
 These are injected into the container:
 
@@ -160,11 +148,11 @@ AWS_REGION
 *AWS region for SDK
 S3_BUCKET	
 *S3 bucket for file uploads
-### Application
+### 📦 Application
 Simple UI for uploading files
 Files are stored in S3
 Runs inside Docker container on EC2
-### Security Highlights
+### 🔐 Security Highlights
 No AWS credentials stored in GitHub
 Uses OIDC (short-lived credentials)
 Deployment via SSM (no SSH required)
